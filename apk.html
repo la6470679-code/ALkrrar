@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مرسال (Mirsal) — الجيل الجديد من التواصل الفائق والآمن</title>
+    <meta name="description" content="تطبيق مرسال (Mirsal) للمراسلة الفورية السحابية، القنوات العملاقة، مشاركة الصوتيات والملفات بلا حدود، وخصوصية متكاملة.">
+
+    <!-- استدعاء Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- استدعاء خط Cairo العربي -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                    },
+                    colors: {
+                        mirsal: {
+                            dark: '#051326',
+                            deep: '#081d38',
+                            blue: '#0066cc',
+                            sky: '#0088cc',
+                            cyan: '#00f2fe',
+                            header: '#4a769e',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-12px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 18px rgba(0, 242, 254, 0.5)' },
+                            '50%': { boxShadow: '0 0 32px rgba(0, 242, 254, 0.9)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background: radial-gradient(circle at 20% 20%, #0d4b82 0%, #072547 45%, #051326 100%);
+            background-attachment: fixed;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.04) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow: 0 8px 32px 0 rgba(2, 12, 27, 0.45);
+        }
+
+        .glass-card-hover {
+            transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .glass-card-hover:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0, 242, 254, 0.55);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(0, 242, 254, 0.07) 100%);
+            box-shadow: 0 14px 40px 0 rgba(0, 242, 254, 0.18);
+        }
+
+        .glass-nav {
+            background: rgba(5, 19, 38, 0.85);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.18);
+        }
+
+        .cyan-glow-text {
+            text-shadow: 0 0 24px rgba(0, 242, 254, 0.5);
+        }
+
+        .btn-primary-glow {
+            background: linear-gradient(135deg, #0088cc 0%, #00c6ff 50%, #00f2fe 100%);
+            color: #041224;
+            box-shadow: 0 4px 24px rgba(0, 242, 254, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-glow:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 32px rgba(0, 242, 254, 0.65);
+        }
+
+        .phone-mockup-frame {
+            background: #0f172a;
+            border: 4px solid #334155;
+            border-radius: 2.2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 242, 254, 0.25);
+            overflow: hidden;
+            position: relative;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #051326;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0e4a80;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f2fe;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-mirsal-cyan selection:text-mirsal-dark">
+
+    <!-- خلفية تفاعلية (فقاعات زجاجية وطائرات ورقية) -->
+    <canvas id="heroCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-70"></canvas>
+
+    <!-- إشعار منبثق (Toast) -->
+    <div id="toastNotification" class="fixed bottom-6 left-6 right-6 sm:left-auto sm:right-8 sm:w-96 z-50 transform translate-y-28 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="glass-card rounded-2xl p-4 border-mirsal-cyan/50 flex items-center gap-3 shadow-2xl bg-[#071e3d]/95">
+            <div id="toastIconBox" class="w-10 h-10 rounded-xl bg-mirsal-cyan/20 border border-mirsal-cyan flex items-center justify-center shrink-0 text-mirsal-cyan">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <div>
+                <h4 id="toastTitle" class="font-bold text-white text-sm">جاري التحميل...</h4>
+                <p id="toastMessage" class="text-xs text-sky-200 mt-0.5">تم تجهيز حزمة تطبيق مرسال بنجاح.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تنبيه لنسخة سطح المكتب (تحت التطوير) -->
+    <div id="desktopDevModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+        <div class="glass-card w-full max-w-md rounded-3xl p-6 sm:p-7 border-amber-400/40 relative shadow-2xl text-center">
+            <button id="closeDesktopDevModal" aria-label="إغلاق النافذة" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sky-200 hover:text-white transition absolute top-4 left-4">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+
+            <div class="w-16 h-16 mx-auto rounded-2xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-300 mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M4.93 19h14.14c1.54 0 2.5-1.67 1.73-3L13.73 4c-.77-1.33-2.69-1.33-3.46 0L3.2 16c-.77 1.33.19 3 1.73 3z"></path>
+                </svg>
+            </div>
+
+            <span class="inline-block px-3 py-1 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-bold mb-2">
+                تنويه الإصدار
+            </span>
+            <h3 class="text-xl font-black text-white mb-2">نسخة سطح المكتب لم تتوفر بعد</h3>
+            <p class="text-sm text-sky-200 leading-relaxed mb-6">
+                نعتذر منك، نسخة تطبيق <strong class="text-white">مرسال (Mirsal)</strong> لسطح المكتب <strong class="text-amber-300">تحت التطوير حالياً</strong> ولم يتم إطلاقها بعد. يمكنك تحميل نسخة الأندرويد المتوفرة الآن.
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <button id="desktopModalDownloadApk" class="btn-primary-glow font-extrabold px-5 py-3 rounded-xl text-sm flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    <span>تحميل APK للأندرويد</span>
+                </button>
+                <button id="confirmDesktopDevBtn" class="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-sm transition">
+                    حسناً
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة أداة دمج الصور الحقيقية ورابط APK وتنزيل index.html -->
+    <div id="builderModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-md overflow-y-auto">
+        <div class="glass-card w-full max-w-2xl rounded-3xl p-6 sm:p-8 border-mirsal-cyan/40 relative my-8 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-white/15 pb-4 mb-5">
+                <div>
+                    <h3 class="text-xl font-black text-white flex items-center gap-2">
+                        <span class="text-mirsal-cyan">🛠️</span> أداة دمج صور مرسال ورابط التحميل
+                    </h3>
+                    <p class="text-xs text-sky-200 mt-1">اختر صورك الحقيقية من جهازك وضع رابط APK ليتم توليد ملف <code class="text-mirsal-cyan">index.html</code> واحد جاهز للنشر.</p>
+                </div>
+                <button id="closeBuilderModal" aria-label="إغلاق" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sky-200 hover:text-white transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-sky-200 font-bold mb-1.5">رابط تحميل ملف التطبيق المباشر (APK URL)</label>
+                    <input id="apkLinkInput" type="url" placeholder="مثال: https://github.com/username/mirsal/releases/download/v1.0/Mirsal.apk"
+                        class="w-full bg-mirsal-dark/80 border border-white/20 focus:border-mirsal-cyan rounded-xl px-4 py-2.5 text-white placeholder-sky-300/40 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <label class="block text-xs font-bold text-mirsal-cyan mb-1">1. شعار التطبيق (ic_telepulse_logo.jpg)</label>
+                        <input type="file" accept="image/*" data-target="logo" class="custom-img-input block w-full text-xs text-sky-200 file:ml-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-mirsal-cyan file:text-mirsal-dark hover:file:opacity-90 cursor-pointer">
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <label class="block text-xs font-bold text-mirsal-cyan mb-1">2. شاشة الرئيسية والتبويبات (160207)</label>
+                        <input type="file" accept="image/*" data-target="scr1" class="custom-img-input block w-full text-xs text-sky-200 file:ml-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-mirsal-cyan file:text-mirsal-dark hover:file:opacity-90 cursor-pointer">
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <label class="block text-xs font-bold text-mirsal-cyan mb-1">3. القائمة الجانبية ولوحة الإدارة (160217)</label>
+                        <input type="file" accept="image/*" data-target="scr2" class="custom-img-input block w-full text-xs text-sky-200 file:ml-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-mirsal-cyan file:text-mirsal-dark hover:file:opacity-90 cursor-pointer">
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <label class="block text-xs font-bold text-mirsal-cyan mb-1">4. القنوات ومشاركة الصوتيات (160227)</label>
+                        <input type="file" accept="image/*" data-target="scr3" class="custom-img-input block w-full text-xs text-sky-200 file:ml-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-mirsal-cyan file:text-mirsal-dark hover:file:opacity-90 cursor-pointer">
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <label class="block text-xs font-bold text-mirsal-cyan mb-1">5. بطاقة الملف الشخصي والعداد (160236)</label>
+                        <input type="file" accept="image/*" data-target="scr4" class="custom-img-input block w-full text-xs text-sky-200 file:ml-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-mirsal-cyan file:text-mirsal-dark hover:file:opacity-90 cursor-pointer">
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10">
+                        <label class="block text-xs font-bold text-mirsal-cyan mb-1">6. تخصيص الحساب والإيموجي (160246)</label>
+                        <input type="file" accept="image/*" data-target="scr5" class="custom-img-input block w-full text-xs text-sky-200 file:ml-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-mirsal-cyan file:text-mirsal-dark hover:file:opacity-90 cursor-pointer">
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-white/5 border border-white/10 sm:col-span-2">
+                        <label class="block text-xs font-bold text-mirsal-cyan mb-1">7. الإعدادات والتخزين المحلي (160259 / 160301)</label>
+                        <input type="file" accept="image/*" data-target="scr6" class="custom-img-input block w-full text-xs text-sky-200 file:ml-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-mirsal-cyan file:text-mirsal-dark hover:file:opacity-90 cursor-pointer">
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-end gap-3 pt-4 border-t border-white/15">
+                    <button id="applyLivePreviewBtn" type="button" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition">
+                        تطبيق المعاينة الآن
+                    </button>
+                    <button id="exportHtmlFileBtn" type="button" class="btn-primary-glow px-6 py-2.5 rounded-xl font-extrabold flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        <span>حفظ وتنزيل index.html</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. شريط التنقل العلوي -->
+    <header class="fixed top-0 inset-x-0 z-40 glass-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+
+                <!-- شعار مرسال -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <div id="appLogoContainer" class="relative w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0077e6] to-[#005bb5] flex items-center justify-center shadow-lg border border-white/25 overflow-hidden group-hover:scale-105 transition-transform">
+                        <svg id="defaultLogoSvg" class="w-10 h-10" viewBox="0 0 100 100" fill="none">
+                            <defs>
+                                <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                    <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <circle cx="50" cy="50" r="38" stroke="#00f2fe" stroke-width="3.5" filter="url(#neonGlow)"/>
+                            <path d="M23 49.5L73 28L60.5 74L47.5 62.5L39.5 70V57.5L65 35.5L36.5 54.5L23 49.5Z" fill="white"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <span class="text-2xl font-black tracking-tight text-white flex items-center gap-1.5">
+                            مرسال <span class="text-mirsal-cyan cyan-glow-text text-lg font-extrabold">Mirsal</span>
+                        </span>
+                        <span class="block text-[11px] text-sky-300 font-medium -mt-1">المراسلة الفورية السحابية</span>
+                    </div>
+                </a>
+
+                <!-- روابط التنقل -->
+                <nav class="hidden lg:flex items-center gap-7 text-sm font-semibold text-sky-100">
+                    <a href="#features" class="hover:text-mirsal-cyan transition-colors">المميزات</a>
+                    <a href="#gallery" class="hover:text-mirsal-cyan transition-colors">واجهات التطبيق</a>
+                    <a href="#comparison" class="hover:text-mirsal-cyan transition-colors">المقارنة</a>
+                    <a href="#faq" class="hover:text-mirsal-cyan transition-colors">الأسئلة الشائعة</a>
+                </nav>
+
+                <!-- أزرار الإجراء العلوية -->
+                <div class="flex items-center gap-3">
+                    <a href="#download" class="btn-primary-glow px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        <span>تحميل التطبيق</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 2. القسم الرئيسي (Hero Section) -->
+    <section class="relative z-10 pt-28 pb-20 lg:pt-36 lg:pb-28 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- شريط حالة التحديث الظاهر في أعلى الصفحة -->
+            <div class="mb-7 glass-card rounded-2xl px-4 py-3 border-mirsal-cyan/40 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 text-xs sm:text-sm text-sky-100">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-extrabold text-xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        محدّث الآن
+                    </span>
+                    <span>تمت إزالة قسم النشر السريع وحذف نسخة الويب، وتفعيل تنبيه التطوير لنسخة سطح المكتب.</span>
+                </div>
+                <span class="text-[11px] text-mirsal-cyan font-bold">مرسال v1.0 • جاهز</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+
+                <!-- النصوص وأزرار التحميل -->
+                <div class="lg:col-span-7 text-center lg:text-right space-y-6">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-mirsal-cyan/40 text-mirsal-cyan text-xs sm:text-sm font-bold shadow-lg">
+                        <span class="w-2.5 h-2.5 rounded-full bg-mirsal-cyan animate-ping"></span>
+                        <span>تطبيق مرسال (Mirsal) • بديل تيلجرام السريع والآمن</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.18] tracking-tight text-white">
+                        تواصل فوري بلا حدود مع
+                        <span class="block mt-2 text-transparent bg-clip-text bg-gradient-to-r from-[#00f2fe] via-[#5ce1e6] to-[#ffffff] cyan-glow-text">
+                            تطبيق مرسال (Mirsal)
+                        </span>
+                    </h1>
+
+                    <p class="text-base sm:text-lg text-sky-100/90 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-normal">
+                        تجربة مراسلة متكاملة تجمع بين السرعة الفائقة، القنوات والمجموعات، مشاركة الصوتيات والملفات، والتحكم الكامل في الخصوصية والمظهر، بإدارة وتخصيص مرن يناسب جميع المستخدمين.
+                    </p>
+
+                    <!-- أزرار التحميل (أندرويد APK + سطح المكتب فقط، بدون نسخة ويب) -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                        <button id="heroDownloadApkBtn" class="w-full sm:w-auto btn-primary-glow font-black text-base px-7 py-4 rounded-2xl flex items-center justify-center gap-3 cursor-pointer">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                            <div class="text-right">
+                                <span class="block text-[11px] font-bold opacity-80 leading-none">تحميل مباشر للأندرويد</span>
+                                <span class="block text-base font-black leading-tight mt-0.5">تنزيل ملف APK</span>
+                            </div>
+                        </button>
+
+                        <button id="heroDesktopBtn" type="button" class="w-full sm:w-auto glass-card hover:border-amber-400/60 text-white font-bold text-sm px-6 py-4 rounded-2xl flex items-center justify-center gap-2.5 transition cursor-pointer">
+                            <svg class="w-5 h-5 text-mirsal-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            <span>نسخة سطح المكتب</span>
+                            <span class="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">تحت التطوير</span>
+                        </button>
+                    </div>
+
+                    <!-- مؤشرات سريعة -->
+                    <div class="grid grid-cols-3 gap-4 pt-6 border-t border-white/15 max-w-xl mx-auto lg:mx-0">
+                        <div>
+                            <div class="text-2xl sm:text-3xl font-black text-mirsal-cyan">0.05s</div>
+                            <div class="text-xs text-sky-200 mt-0.5">سرعة وصول الرسائل</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl sm:text-3xl font-black text-white">6.52 MB</div>
+                            <div class="text-xs text-sky-200 mt-0.5">خفة التخزين المحلي</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl sm:text-3xl font-black text-mirsal-cyan">100%</div>
+                            <div class="text-xs text-sky-200 mt-0.5">تحكم بالخصوصية</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- محاكي تفاعلي حي لواجهة مرسال -->
+                <div class="lg:col-span-5 flex justify-center">
+                    <div class="phone-mockup-frame w-full max-w-[360px] animate-float">
+                        <div class="bg-[#4a769e] px-4 py-3 flex items-center justify-between text-white shadow-md">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-9 h-9 rounded-full bg-rose-600 flex items-center justify-center font-black text-sm shadow">
+                                    📢
+                                </div>
+                                <div>
+                                    <div class="text-sm font-extrabold flex items-center gap-1">
+                                        <span>قناة مرسال الرسمية</span>
+                                        <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-sky-400 text-[10px] text-slate-950 font-black">✓</span>
+                                    </div>
+                                    <div class="text-[11px] text-sky-100/90">قنوات • مجموعات • محادثات فورية</div>
+                                </div>
+                            </div>
+                            <span class="text-xs bg-white/15 px-2 py-0.5 rounded-full">مباشر</span>
+                        </div>
+
+                        <div id="chatMessagesBox" class="bg-[#0b192c] h-80 p-4 space-y-3 overflow-y-auto text-xs">
+                            <div class="text-center">
+                                <span class="inline-block bg-black/50 text-sky-100 px-3 py-1 rounded-full text-[11px]">اليوم</span>
+                            </div>
+
+                            <div class="bg-[#172a45] text-sky-50 rounded-2xl rounded-tr-sm p-3 max-w-[85%] border border-white/10 shadow">
+                                <div class="text-[11px] font-bold text-mirsal-cyan mb-1">مرسال • المراسلة الفورية</div>
+                                أهلاً بك في تطبيق <strong>مرسال</strong>! جرّب إرسال رسالة هنا لاختبار سرعة واستجابة واجهة الدردشة.
+                                <div class="text-[10px] text-sky-300/70 text-left mt-1">04:02 م ✓✓</div>
+                            </div>
+
+                            <div class="bg-[#e9f8cf] text-slate-900 rounded-2xl rounded-tl-sm p-3 max-w-[85%] mr-auto shadow">
+                                <div class="flex items-center justify-between gap-2 text-[11px] font-bold text-sky-700 mb-1.5">
+                                    <span>slymany</span>
+                                    <span dir="ltr">+967783673470</span>
+                                </div>
+                                <div class="bg-sky-500/15 rounded-xl p-2 flex items-center gap-2.5">
+                                    <span class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">▶</span>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="font-bold text-slate-900 truncate">مقطع صوتي • MP3</div>
+                                        <div class="text-[10px] text-slate-600">موسيقى / صوت • جاهز للتشغيل</div>
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-slate-600 text-left mt-1">06:28 م ✓</div>
+                            </div>
+                        </div>
+
+                        <form id="simChatForm" class="bg-white p-2.5 flex items-center gap-2 border-t border-slate-200">
+                            <input id="simChatInput" type="text" placeholder="اكتب رسالة أو أضف ملصقات..."
+                                class="flex-1 bg-slate-100 text-slate-900 placeholder-slate-500 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                            <button type="submit" aria-label="إرسال" class="w-10 h-10 rounded-xl bg-sky-600 hover:bg-sky-700 text-white flex items-center justify-center shrink-0 transition">
+                                <svg class="w-4 h-4 rotate-180" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. قسم المميزات الرئيسية -->
+    <section id="features" class="relative z-10 py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <span class="text-mirsal-cyan font-extrabold text-sm tracking-wide">لماذا يختار المستخدمون مرسال؟</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-white mt-2">مميزات عملية مصممة للتواصل اليومي السريع</h2>
+                <p class="text-sky-200 mt-3 text-sm sm:text-base">كل أداة في تطبيق مرسال بُنيت لتمنحك سرعة في التنقل، وضوحاً في القراءة، وتحكماً كاملاً في حسابك وصلاحياتك.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="glass-card glass-card-hover rounded-3xl p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-mirsal-cyan/15 border border-mirsal-cyan/40 flex items-center justify-center text-2xl mb-4">🗂️</div>
+                    <h3 class="text-lg font-extrabold text-white mb-2">تبويبات فرز ذكية وفورية</h3>
+                    <p class="text-sm text-sky-200 leading-relaxed">تنقل سريع بين (الكل، محادثات، مجموعات، قنوات) مع أزرار إنشاء فورية للمجموعات والقنوات الجديدة.</p>
+                </div>
+
+                <div class="glass-card glass-card-hover rounded-3xl p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-mirsal-cyan/15 border border-mirsal-cyan/40 flex items-center justify-center text-2xl mb-4">🛡️</div>
+                    <h3 class="text-lg font-extrabold text-white mb-2">لوحة الإدارة والصلاحيات</h3>
+                    <p class="text-sm text-sky-200 leading-relaxed">إدارة متكاملة للمستخدمين والصلاحيات والشارات، مع متابعة نشاط الدخول والخروج بوضوح.</p>
+                </div>
+
+                <div class="glass-card glass-card-hover rounded-3xl p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-mirsal-cyan/15 border border-mirsal-cyan/40 flex items-center justify-center text-2xl mb-4">🎵</div>
+                    <h3 class="text-lg font-extrabold text-white mb-2">مشاركة الصوتيات والملصقات</h3>
+                    <p class="text-sm text-sky-200 leading-relaxed">إرسال وتشغيل المقاطع الصوتية مباشرة داخل القنوات والمحادثات، ودعم الملصقات المتنوعة والملفات.</p>
+                </div>
+
+                <div class="glass-card glass-card-hover rounded-3xl p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-mirsal-cyan/15 border border-mirsal-cyan/40 flex items-center justify-center text-2xl mb-4">✨</div>
+                    <h3 class="text-lg font-extrabold text-white mb-2">تخصيص الهوية والإيموجي</h3>
+                    <p class="text-sm text-sky-200 leading-relaxed">تعديل الاسم المعروض، المعرّف @username، السيرة الذاتية، صورة الغلاف والخلفية، واختيار أيقونات وحالات إيموجي.</p>
+                </div>
+
+                <div class="glass-card glass-card-hover rounded-3xl p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-mirsal-cyan/15 border border-mirsal-cyan/40 flex items-center justify-center text-2xl mb-4">🔒</div>
+                    <h3 class="text-lg font-extrabold text-white mb-2">خصوصية وقفل رمز المرور</h3>
+                    <p class="text-sm text-sky-200 leading-relaxed">خيارات متقدمة لإخفاء الرقم، قفل التطبيق برمز مرور، وضبط الإشعارات والاهتزاز ومعاينة الرسائل.</p>
+                </div>
+
+                <div class="glass-card glass-card-hover rounded-3xl p-6">
+                    <div class="w-12 h-12 rounded-2xl bg-mirsal-cyan/15 border border-mirsal-cyan/40 flex items-center justify-center text-2xl mb-4">🎨</div>
+                    <h3 class="text-lg font-extrabold text-white mb-2">تخصيص الخطوط والسمات</h3>
+                    <p class="text-sm text-sky-200 leading-relaxed">تحكم بحجم الخط (مثل 15sp)، زوايا الفقاعات، دعم GIF، التبديل بين النهاري والليلي، ومراقبة التخزين المحلي.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. معرض الشاشات الـ 6 لتطبيق مرسال مع شرح دقيق -->
+    <section id="screens" class="relative z-10 py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <span class="text-mirsal-cyan font-extrabold text-sm tracking-wide">جولة داخل التطبيق</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-white mt-2">معرض واجهات تطبيق مرسال وشرحها التفصيلي</h2>
+                <p class="text-sky-200 mt-3 text-sm sm:text-base">
+                    استعرض الشاشات الست الرئيسية من تطبيق مرسال مع شرح دقيق لوظيفة كل شاشة، ويمكنك إدراج صورك الحقيقية من جهازك عبر زر <strong class="text-mirsal-cyan">"إدراج صوري وحفظ HTML"</strong>.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                <!-- الشاشة 1 -->
+                <article class="glass-card glass-card-hover rounded-3xl p-5 flex flex-col">
+                    <div id="preview-scr1" class="rounded-2xl overflow-hidden bg-slate-100 text-slate-900 border border-white/20 shadow-inner mb-4">
+                        <div class="bg-[#4a769e] text-white px-3.5 py-2.5 flex items-center justify-between text-xs">
+                            <div class="flex items-center gap-2">
+                                <span class="w-7 h-7 rounded-full bg-slate-800/40 flex items-center justify-center">🛡️</span>
+                                <span class="w-7 h-7 rounded-full bg-slate-800/40 flex items-center justify-center">🔍</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-extrabold">🕊️ slymany</div>
+                                <div class="text-[10px] text-sky-100">سليماني • المراسلة الفورية</div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-amber-200 text-slate-900 flex items-center justify-center font-bold text-[10px]">صورة</div>
+                                <span class="text-base">☰</span>
+                            </div>
+                        </div>
+                        <div class="p-3 space-y-2.5 bg-[#f8fafc] text-[11px]">
+                            <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+                                <span class="px-2.5 py-1 rounded-lg bg-purple-100 text-purple-900 font-bold whitespace-nowrap">الكل (1) • 1 جديد</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-white border text-slate-700 font-semibold whitespace-nowrap">محادثات</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-white border text-slate-700 font-semibold whitespace-nowrap">مجموعات</span>
+                                <span class="px-2.5 py-1 rounded-lg bg-white border text-slate-700 font-semibold whitespace-nowrap">قنوات</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="bg-white border border-sky-200 text-sky-700 rounded-xl py-1.5 px-2 text-center font-bold">📢 قناة جديدة</div>
+                                <div class="bg-white border border-sky-200 text-sky-700 rounded-xl py-1.5 px-2 text-center font-bold">👥+ مجموعة جديدة</div>
+                            </div>
+                            <div class="bg-white rounded-2xl p-2.5 border border-slate-200 flex items-center justify-between gap-2">
+                                <div class="text-right min-w-0">
+                                    <div class="flex items-center justify-end gap-1 font-extrabold text-slate-900">
+                                        <span class="text-blue-600">✔</span>
+                                        <span class="truncate">قناة سليماني الرسميه</span>
+                                    </div>
+                                    <div class="flex items-center justify-end gap-1.5 text-[10px] text-slate-500 mt-1">
+                                        <span class="px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 font-bold">رسمية</span>
+                                        <span>📎</span>
+                                        <span class="truncate">احتزم وأبشر - عيسى الليث 1448هـ.mp3</span>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 shrink-0">
+                                    <span class="text-[10px] text-slate-400">24/11</span>
+                                    <div class="w-10 h-10 rounded-full bg-rose-600 text-white flex items-center justify-center text-base">📢</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-extrabold text-white mb-1.5">1. الواجهة الرئيسية والتبويبات</h3>
+                    <p class="text-xs sm:text-sm text-sky-200 leading-relaxed">
+                        تعرض شريطاً علوياً للبحث والأمان، وتبويبات الفرز (الكل، محادثات، مجموعات، قنوات)، وأزرار إنشاء قناة أو مجموعة جديدة، مع إظهار شارات التوثيق وحالة "رسمية" وآخر ملف مرسل.
+                    </p>
+                </article>
+
+                <!-- الشاشة 2 -->
+                <article class="glass-card glass-card-hover rounded-3xl p-5 flex flex-col">
+                    <div id="preview-scr2" class="rounded-2xl overflow-hidden bg-white text-slate-900 border border-white/20 shadow-inner mb-4">
+                        <div class="h-24 bg-gradient-to-l from-slate-800 via-slate-700 to-sky-900 text-white p-3 flex flex-col justify-between relative">
+                            <div class="flex items-center justify-between">
+                                <span class="w-7 h-7 rounded-full bg-black/40 flex items-center justify-center text-sm">🌙</span>
+                                <div class="w-11 h-11 rounded-full border-2 border-white/80 bg-amber-200 text-slate-900 flex items-center justify-center text-[10px] font-bold">صورة</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs font-extrabold">🕊️ slymany</div>
+                                <div class="text-[10px] text-sky-200" dir="ltr">admin_official@ • +967783673470</div>
+                            </div>
+                        </div>
+                        <div class="p-3 space-y-2 text-[11px] font-bold text-slate-700">
+                            <div class="flex items-center justify-between py-1 border-b border-slate-100"><span>الحساب والملف الشخصي</span><span>👤</span></div>
+                            <div class="flex items-center justify-between py-1 border-b border-slate-100"><span>مجموعة جديدة</span><span>👥+</span></div>
+                            <div class="flex items-center justify-between py-1 border-b border-slate-100"><span>قناة جديدة</span><span>📢</span></div>
+                            <div class="flex items-center justify-between py-1 border-b border-slate-100"><span>جهات الاتصال • الرسائل المحفوظة</span><span>🔖</span></div>
+                            <div class="flex items-center justify-between py-1.5 px-2 rounded-xl bg-sky-50 text-sky-800"><span>لوحة الإدارة والصلاحيات</span><span>🛡️</span></div>
+                            <div class="flex items-center justify-between pt-1 text-rose-600"><span>تسجيل الخروج / تبديل الحساب</span><span>↪</span></div>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-extrabold text-white mb-1.5">2. القائمة الجانبية ولوحة الإدارة</h3>
+                    <p class="text-xs sm:text-sm text-sky-200 leading-relaxed">
+                        تحتوي على بطاقة الغلاف والمعلومات الشخصية، وزر التبديل للوضع الليلي، واختصارات المجموعات والقنوات وجهات الاتصال والرسائل المحفوظة، بالإضافة إلى "لوحة الإدارة والصلاحيات".
+                    </p>
+                </article>
+
+                <!-- الشاشة 3 -->
+                <article class="glass-card glass-card-hover rounded-3xl p-5 flex flex-col">
+                    <div id="preview-scr3" class="rounded-2xl overflow-hidden bg-[#0b192c] text-white border border-white/20 shadow-inner mb-4 flex flex-col justify-between">
+                        <div class="bg-[#4a769e] px-3 py-2 flex items-center justify-between text-xs">
+                            <span>⋮ 🔍</span>
+                            <div class="text-right">
+                                <div class="font-extrabold">قناة سليماني الرسميه</div>
+                                <div class="text-[10px] text-sky-100">قناة • 46 مشارك</div>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-7 h-7 rounded-full bg-rose-600 flex items-center justify-center text-xs">📢</span>
+                                <span>→</span>
+                            </div>
+                        </div>
+                        <div class="p-3 space-y-2.5 text-[11px]">
+                            <div class="text-center"><span class="px-2.5 py-0.5 rounded-full bg-black/50 text-[10px]">24 نوفمبر</span></div>
+                            <div class="bg-[#e9f8cf] text-slate-900 rounded-2xl rounded-tl-sm p-2.5 mr-auto max-w-[88%]">
+                                <div class="flex items-center justify-between text-[10px] font-bold text-sky-700 mb-1">
+                                    <span>slymany • +967783673470</span>
+                                    <span>🚩</span>
+                                </div>
+                                <div class="bg-sky-500/15 rounded-xl p-2 flex items-center justify-between gap-2">
+                                    <div class="text-right min-w-0">
+                                        <div class="font-bold truncate">احتزم وأبشر - عي...</div>
+                                        <div class="text-[10px] text-slate-600">موسيقى / صوت •</div>
+                                    </div>
+                                    <span class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0">▶</span>
+                                </div>
+                                <div class="text-[10px] text-slate-600 text-left mt-1">06:28 م ✓</div>
+                            </div>
+                        </div>
+                        <div class="bg-white text-slate-700 px-2.5 py-2 flex items-center justify-between gap-2 text-[11px]">
+                            <span class="text-sky-600 font-bold">➤</span>
+                            <span>📎</span>
+                            <div class="flex-1 bg-slate-100 rounded-full px-3 py-1 text-right text-slate-500 truncate">اكتب رسالة أو أضف ملصقات بريميوم...</div>
+                            <span>😊</span>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-extrabold text-white mb-1.5">3. القنوات ومشاركة الصوتيات والملصقات</h3>
+                    <p class="text-xs sm:text-sm text-sky-200 leading-relaxed">
+                        توضح عرض عدد المشاركين في القناة، وتنظيم الرسائل حسب التاريخ، وتشغيل الملفات الصوتية مباشرة داخل الفقاعة، مع حقل إدخال يدعم المرفقات و"ملصقات بريميوم".
+                    </p>
+                </article>
+
+                <!-- الشاشة 4 -->
+                <article class="glass-card glass-card-hover rounded-3xl p-5 flex flex-col">
+                    <div id="preview-scr4" class="rounded-2xl overflow-hidden bg-white text-slate-900 border border-white/20 shadow-inner mb-4">
+                        <div class="h-24 bg-gradient-to-r from-slate-800 via-stone-700 to-sky-900 text-white p-3 flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-bold">✕</span>
+                                <div class="w-11 h-11 rounded-full border-2 border-white bg-amber-200 text-slate-900 flex items-center justify-center text-[10px] font-bold">صورة</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs font-extrabold">🕊️ slymany</div>
+                                <div class="flex items-center justify-end gap-1.5 text-[10px]">
+                                    <span class="px-2 py-0.5 rounded-full bg-white/20">المالك العام ✓</span>
+                                    <span dir="ltr">+967783673470</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 space-y-2 text-[11px]">
+                            <div class="bg-slate-100 rounded-xl p-2 text-right">
+                                <div class="font-bold text-sky-700">admin_official@</div>
+                                <div class="text-slate-600 text-[10px]">الانصار</div>
+                            </div>
+                            <div class="bg-slate-50 border border-slate-200 rounded-xl py-1.5 px-3 flex items-center justify-between font-bold">
+                                <span class="text-rose-600">مرات الخروج: 0 🔴</span>
+                                <span class="text-emerald-600">مرات الدخول: 0 🟢</span>
+                            </div>
+                            <div class="space-y-1.5 font-bold text-sky-700">
+                                <div class="flex items-center justify-between px-2">
+                                    <span class="text-xs">إزالة الصورة</span>
+                                    <span class="flex-1 mr-2 border border-sky-200 rounded-xl py-1.5 text-center">صورة الحساب 📷</span>
+                                </div>
+                                <div class="border border-sky-200 rounded-xl py-1.5 text-center">تغيير خلفية الحساب (صور وألوان)</div>
+                                <div class="border border-sky-200 rounded-xl py-1.5 text-center">تعديل الملف الشخصي والخصوصية ✎</div>
+                                <div class="bg-rose-700 text-white rounded-xl py-2 text-center">تسجيل الخروج / تبديل الرقم ↪</div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-extrabold text-white mb-1.5">4. بطاقة الملف الشخصي المتكاملة</h3>
+                    <p class="text-xs sm:text-sm text-sky-200 leading-relaxed">
+                        تجمع بيانات الحساب والشارة التعريفية، وتعرض عداد "مرات الدخول" و"مرات الخروج"، وتتيح تغيير صورة الحساب أو خلفية الحساب (صور وألوان) وتعديل الخصوصية أو تبديل الحساب.
+                    </p>
+                </article>
+
+                <!-- الشاشة 5 -->
+                <article class="glass-card glass-card-hover rounded-3xl p-5 flex flex-col">
+                    <div id="preview-scr5" class="rounded-2xl overflow-hidden bg-[#f1eff5] text-slate-900 border border-white/20 shadow-inner mb-4">
+                        <div class="bg-[#4a769e] text-white px-3 py-2 flex items-center justify-between text-xs font-bold">
+                            <span>الحساب والملف الشخصي</span>
+                            <span>→</span>
+                        </div>
+                        <div class="p-3 space-y-2 text-[11px]">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="space-y-1 flex-1 text-center font-bold text-sky-700">
+                                    <div class="bg-white border border-sky-200 rounded-xl py-1">اختيار صورة للحساب 📷</div>
+                                    <div class="text-[10px]">إزالة الصورة الشخصية</div>
+                                </div>
+                                <div class="w-12 h-12 rounded-full border-2 border-white bg-amber-200 flex items-center justify-center text-[10px] font-bold shrink-0">صورة</div>
+                            </div>
+                            <div class="bg-white rounded-xl p-2 text-right border border-slate-200">
+                                <div class="text-[10px] text-slate-400">الاسم المعروض</div>
+                                <div class="font-bold">slymany</div>
+                            </div>
+                            <div class="bg-white rounded-xl p-2 text-right border border-slate-200">
+                                <div class="text-[10px] text-slate-400">اسم المستخدم (@username)</div>
+                                <div class="font-bold">admin_official</div>
+                            </div>
+                            <div class="bg-white rounded-xl p-2 text-right border border-slate-200">
+                                <div class="text-[10px] text-slate-400">السيرة الذاتية (Bio)</div>
+                                <div class="font-bold">الانصار</div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] font-bold text-slate-600 text-right mb-1">أيقونة الحساب وحالة الإيموجي بجانب الاسم:</div>
+                                <div class="grid grid-cols-4 gap-1.5 text-center text-sm bg-white p-1.5 rounded-xl border border-slate-200">
+                                    <span>🚀</span><span>👑</span><span>😎</span><span>🎆</span>
+                                    <span>🌹</span><span>💼</span><span>🔥</span><span>💎</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-extrabold text-white mb-1.5">5. تخصيص الحساب والرموز التعبيرية</h3>
+                    <p class="text-xs sm:text-sm text-sky-200 leading-relaxed">
+                        تمكنك من تحرير الاسم المعروض، اسم المستخدم (@username)، والسيرة الذاتية، مع اختيار أيقونة بديلة للحساب وإضافة حالة إيموجي مميزة تظهر بجانب الاسم.
+                    </p>
+                </article>
+
+                <!-- الشاشة 6 -->
+                <article class="glass-card glass-card-hover rounded-3xl p-5 flex flex-col">
+                    <div id="preview-scr6" class="rounded-2xl overflow-hidden bg-slate-100 text-slate-900 border border-white/20 shadow-inner mb-4">
+                        <div class="bg-[#4a769e] text-white px-3 py-2 flex items-center justify-between text-xs font-bold">
+                            <span>الإعدادات</span>
+                            <span>→</span>
+                        </div>
+                        <div class="h-20 bg-gradient-to-l from-slate-800 to-sky-900 text-white p-2.5 flex items-end justify-between">
+                            <div class="w-11 h-11 rounded-full border-2 border-white bg-amber-200 text-slate-900 flex items-center justify-center text-[10px] font-bold">صورة</div>
+                            <div class="text-right">
+                                <div class="text-xs font-extrabold">🕊️ slymany</div>
+                                <div class="text-[9px] text-sky-200">admin_official@ • +967783673470</div>
+                                <div class="text-[9px] text-sky-300">الانصار</div>
+                            </div>
+                        </div>
+                        <div class="p-2.5 space-y-1.5 text-[10px] bg-white">
+                            <div class="flex items-center justify-between p-1.5 rounded-xl border border-slate-100">
+                                <div class="text-right"><div class="font-extrabold text-xs">الحساب والملف الشخصي</div><div class="text-slate-500">صورة الحساب، الاسم، المعرّف، السيرة، الخلفية</div></div>
+                                <span class="w-7 h-7 rounded-lg bg-sky-500 text-white flex items-center justify-center">👤</span>
+                            </div>
+                            <div class="flex items-center justify-between p-1.5 rounded-xl border border-slate-100">
+                                <div class="text-right"><div class="font-extrabold text-xs">إعدادات الدردشة والفقاعات</div><div class="text-slate-500">حجم الخط (15sp)، الزوايا، GIF، الإدخال</div></div>
+                                <span class="w-7 h-7 rounded-lg bg-emerald-500 text-white flex items-center justify-center">💬</span>
+                            </div>
+                            <div class="flex items-center justify-between p-1.5 rounded-xl border border-slate-100">
+                                <div class="text-right"><div class="font-extrabold text-xs">الخصوصية والأمان وقفل التطبيق</div><div class="text-slate-500">إخفاء الرقم وقفل رمز المرور</div></div>
+                                <span class="w-7 h-7 rounded-lg bg-indigo-500 text-white flex items-center justify-center">🔒</span>
+                            </div>
+                            <div class="flex items-center justify-between p-1.5 rounded-xl border border-slate-100">
+                                <div class="text-right"><div class="font-extrabold text-xs">البيانات والتخزين المحلي</div><div class="text-slate-500">المساحة المستخدمة محلياً: 6.52 MB</div></div>
+                                <span class="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center">☰</span>
+                            </div>
+                            <div class="flex items-center justify-between p-1.5 rounded-xl border border-slate-100">
+                                <div class="text-right"><div class="font-extrabold text-xs">المظهر والسمات واللغة</div><div class="text-slate-500">نهاري كلاسيكي • العربية</div></div>
+                                <span class="w-7 h-7 rounded-lg bg-purple-600 text-white flex items-center justify-center">🎨</span>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 class="text-lg font-extrabold text-white mb-1.5">6. الإعدادات الشاملة والتخزين المحلي</h3>
+                    <p class="text-xs sm:text-sm text-sky-200 leading-relaxed">
+                        تضم جميع إعدادات التطبيق في مكان واحد: الدردشة والفقاعات (حجم الخط 15sp، الزوايا، GIF)، الخصوصية وقفل رمز المرور، الإشعارات، التخزين المحلي (6.52 MB)، والمظهر واللغة.
+                    </p>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. قسم المقارنة -->
+    <section id="comparison" class="relative z-10 py-20">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <span class="text-mirsal-cyan font-extrabold text-sm">مقارنة واضحة</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-white mt-2">مرسال مقابل تطبيقات المراسلة التقليدية</h2>
+            </div>
+
+            <div class="glass-card rounded-3xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm">
+                        <thead>
+                            <tr class="border-b border-white/15 bg-white/5 text-sky-200">
+                                <th class="py-4 px-5 font-extrabold">المعيار</th>
+                                <th class="py-4 px-5 font-black text-mirsal-cyan">مرسال (Mirsal)</th>
+                                <th class="py-4 px-5 font-bold">التطبيقات التقليدية</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/10 text-sky-100">
+                            <tr>
+                                <td class="py-4 px-5 font-bold">الاستهلاك المحلي للبيانات</td>
+                                <td class="py-4 px-5 text-emerald-300 font-bold">خفيف جداً (6.52 MB في الإعدادات)</td>
+                                <td class="py-4 px-5 text-sky-200/75">يميل للثقل مع تراكم المحادثات</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 px-5 font-bold">تخصيص المظهر والحساب</td>
+                                <td class="py-4 px-5 text-emerald-300 font-bold">حجم الخط، زوايا الفقاعات، خلفيات، إيموجي</td>
+                                <td class="py-4 px-5 text-sky-200/75">خيارات تخصيص محدودة</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 px-5 font-bold">إدارة الصلاحيات والشارات</td>
+                                <td class="py-4 px-5 text-emerald-300 font-bold">لوحة إدارة وصلاحيات + عداد دخول وخروج</td>
+                                <td class="py-4 px-5 text-sky-200/75">أدوات إدارية معقدة أو مدفوعة</td>
+                            </tr>
+                            <tr>
+                                <td class="py-4 px-5 font-bold">الخصوصية وقفل التطبيق</td>
+                                <td class="py-4 px-5 text-emerald-300 font-bold">إخفاء الرقم وقفل رمز المرور مباشرة</td>
+                                <td class="py-4 px-5 text-sky-200/75">متفاوتة حسب النظام</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. قسم التحميل -->
+    <section id="download" class="relative z-10 py-20">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card rounded-3xl p-8 sm:p-12 text-center border-mirsal-cyan/40 relative overflow-hidden">
+                <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-br from-[#0077e6] to-[#005bb5] flex items-center justify-center shadow-2xl border border-white/25 mb-6 animate-pulse-glow">
+                    <svg class="w-14 h-14" viewBox="0 0 100 100" fill="none">
+                        <circle cx="50" cy="50" r="38" stroke="#00f2fe" stroke-width="3.5"/>
+                        <path d="M23 49.5L73 28L60.5 74L47.5 62.5L39.5 70V57.5L65 35.5L36.5 54.5L23 49.5Z" fill="white"/>
+                    </svg>
+                </div>
+                <!-- أزرار التحميل المباشرة -->
+                <div class="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3.5 pt-2">
+                    <button type="button" onclick="handleApkDownload()" class="btn-primary-glow px-6 py-4 rounded-2xl font-extrabold text-base flex items-center justify-center gap-3 cursor-pointer">
+                        <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.463 11.463 0 00-8.94 0L5.65 5.67c-.19-.29-.58-.38-.87-.2-.28.18-.37.54-.22.83L6.4 9.48A10.78 10.78 0 001 18h22a10.78 10.78 0 00-5.4-8.52zM7 15.25a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5zm10 0a1.25 1.25 0 110-2.5 1.25 1.25 0 010 2.5z"/>
+                        </svg>
+                        <div class="text-right">
+                            <div class="text-sm leading-tight">تحميل APK (أندرويد)</div>
+                            <div class="text-[11px] font-semibold opacity-80">تثبيت مباشر وسريع</div>
+                        </div>
+                    </button>
+
+                    <button type="button" onclick="handleDesktopClick()" class="glass-card px-5 py-4 rounded-2xl font-bold text-sm text-white hover:border-mirsal-cyan/60 transition-all flex items-center justify-center gap-2.5 cursor-pointer">
+                        <svg class="w-5 h-5 text-mirsal-cyan shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>سطح المكتب</span>
+                    </button>
+                </div>
+
+                <p id="currentApkStatus" class="text-xs text-sky-300/80 mt-5">
+                    رابط التحميل المباشر لملف <code class="text-mirsal-cyan">mursal.apk</code> مفعّل وجاهز للتنزيل عبر GitHub Releases.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. الأسئلة الشائعة -->
+    <section id="faq" class="relative z-10 py-16">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <span class="text-mirsal-cyan font-extrabold text-sm">إجابات سريعة</span>
+                <h2 class="text-3xl font-black text-white mt-1">الأسئلة الشائعة حول مرسال</h2>
+            </div>
+
+            <div class="space-y-4">
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <button type="button" onclick="toggleFaq(this)" class="faq-btn w-full px-6 py-4 text-right flex items-center justify-between font-bold text-white text-sm sm:text-base cursor-pointer">
+                        <span>هل نسخة سطح المكتب متوفرة حالياً للتحميل؟</span>
+                        <span class="faq-icon text-mirsal-cyan text-xl transition-transform">+</span>
+                    </button>
+                    <div class="faq-content hidden px-6 pb-4 text-sm text-sky-200 leading-relaxed">
+                        لا، نسخة سطح المكتب لم تتوفر بعد لأنها تحت التطوير حالياً، ويمكنك تجربة تحميل نسخة الأندرويد المتوفرة.
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <button type="button" onclick="toggleFaq(this)" class="faq-btn w-full px-6 py-4 text-right flex items-center justify-between font-bold text-white text-sm sm:text-base cursor-pointer">
+                        <span>كيف أتحكم في الخصوصية وقفل التطبيق داخل مرسال؟</span>
+                        <span class="faq-icon text-mirsal-cyan text-xl transition-transform">+</span>
+                    </button>
+                    <div class="faq-content hidden px-6 pb-4 text-sm text-sky-200 leading-relaxed">
+                        من خلال قسم "الإعدادات > الخصوصية والأمان وقفل التطبيق" يمكنك إخفاء الرقم وتفعيل قفل رمز المرور بسهولة.
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl overflow-hidden">
+                    <button type="button" onclick="toggleFaq(this)" class="faq-btn w-full px-6 py-4 text-right flex items-center justify-between font-bold text-white text-sm sm:text-base cursor-pointer">
+                        <span>كيف أربط ملف APK الخاص بتطبيق مرسال للتحميل المباشر؟</span>
+                        <span class="faq-icon text-mirsal-cyan text-xl transition-transform">+</span>
+                    </button>
+                    <div class="faq-content hidden px-6 pb-4 text-sm text-sky-200 leading-relaxed">
+                        ارفع ملف <code class="text-mirsal-cyan">Mirsal.apk</code> على استضافة أو GitHub Releases ثم ضع رابطه المباشر داخل المتغير <code class="text-mirsal-cyan">APK_DOWNLOAD_URL</code> في كود الصفحة.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- الفوتر (Footer) -->
+    <footer class="relative z-10 border-t border-white/10 bg-[#041020]/90 py-10 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-mirsal-sky/20 border border-mirsal-cyan/40 flex items-center justify-center text-mirsal-cyan font-black">
+                    م
+                </div>
+                <div>
+                    <div class="font-extrabold text-white">مرسال (Mirsal)</div>
+                    <div class="text-xs text-sky-300">تطبيق مراسلة فورية متكامل وعصري</div>
+                </div>
+            </div>
+            <p class="text-xs text-sky-200/80 text-center sm:text-left">
+                © 2026 تطبيق مرسال (Mirsal). جميع الحقوق محفوظة.
+            </p>
+        </div>
+    </footer>
+
+    <!-- نافذة رسالة نسخة سطح المكتب (تحت التطوير) -->
+    <div id="desktopModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+        <div class="glass-card max-w-md w-full rounded-3xl p-6 sm:p-7 border-mirsal-cyan/40 relative text-center">
+            <button type="button" onclick="closeDesktopModal()" aria-label="إغلاق" class="absolute top-4 left-4 w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition cursor-pointer">
+                ✕
+            </button>
+            <div class="w-14 h-14 rounded-2xl bg-amber-400/15 border border-amber-300/40 text-amber-300 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-black text-white mb-2">نسخة سطح المكتب غير متوفرة حالياً</h3>
+            <p class="text-sm text-sky-200 leading-relaxed mb-6">
+                لم تتوفر نسخة سطح المكتب بعد لأنها <span class="text-mirsal-cyan font-bold">تحت التطوير</span> حالياً. يمكنك تحميل نسخة الأندرويد (APK) الآن أو متابعة التحديثات القادمة.
+            </p>
+            <button type="button" onclick="closeDesktopModal()" class="btn-primary-glow w-full py-3 rounded-xl font-extrabold text-sm cursor-pointer">
+                حسناً، فهمت
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // رابط تحميل ملف APK الخاص بتطبيق مرسال
+        const APK_DOWNLOAD_URL = "https://github.com/la6470679-code/ALkrrar/releases/download/mursal/mursal.apk";
+
+        function showToast(title, message) {
+            const toast = document.getElementById('toastNotification');
+            const toastTitle = document.getElementById('toastTitle');
+            const toastMessage = document.getElementById('toastMessage');
+            if (!toast || !toastTitle || !toastMessage) return;
+
+            toastTitle.textContent = title;
+            toastMessage.textContent = message;
+
+            toast.classList.remove('translate-y-28', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(window.__toastTimer);
+            window.__toastTimer = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-28', 'opacity-0');
+            }, 3800);
+        }
+
+        function handleApkDownload() {
+            try {
+                showToast('تطبيق مرسال (APK)', 'جاري بدء تحميل ملف mursal.apk من GitHub...');
+                if (APK_DOWNLOAD_URL && APK_DOWNLOAD_URL !== '#download') {
+                    const link = document.createElement('a');
+                    link.href = APK_DOWNLOAD_URL;
+                    link.download = 'mursal.apk';
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            } catch (err) {
+                showToast('تنبيه', 'تعذر بدء التحميل تلقائياً، يرجى المحاولة مرة أخرى.');
+            }
+        }
+
+        function handleDesktopClick() {
+            try {
+                showToast('نسخة سطح المكتب', 'لم تتوفر بعد لأنها تحت التطوير.');
+                const modal = document.getElementById('desktopModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
+            } catch (err) {
+                showToast('نسخة سطح المكتب', 'لم تتوفر بعد لأنها تحت التطوير.');
+            }
+        }
+
+        function closeDesktopModal() {
+            const modal = document.getElementById('desktopModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        // ربط أزرار الهيدر والبطل والمحاكي بأمان دون أخطاء في حال غياب عنصر
+        document.addEventListener('DOMContentLoaded', () => {
+            const heroApkBtn = document.getElementById('heroDownloadApkBtn');
+            if (heroApkBtn) {
+                heroApkBtn.addEventListener('click', handleApkDownload);
+            }
+
+            const heroDesktopBtn = document.getElementById('heroDesktopBtn');
+            if (heroDesktopBtn) {
+                heroDesktopBtn.addEventListener('click', handleDesktopClick);
+            }
+
+            const simForm = document.getElementById('simChatForm');
+            if (simForm) {
+                simForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    const input = document.getElementById('simChatInput');
+                    const messagesContainer = document.getElementById('chatMessagesBox');
+                    if (!input || !messagesContainer) return;
+
+                    const text = input.value.trim();
+                    if (!text) return;
+
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+                    const outgoing = document.createElement('div');
+                    outgoing.className = 'bg-[#e9f8cf] text-slate-900 rounded-2xl rounded-tl-sm p-3 max-w-[85%] mr-auto shadow';
+                    outgoing.innerHTML = `<div class="text-[11px] font-bold text-sky-700 mb-1">أنت</div><p>${escapeHtml(text)}</p><div class="text-[10px] text-slate-600 text-left mt-1">${timeStr} ✓✓</div>`;
+                    messagesContainer.appendChild(outgoing);
+                    input.value = '';
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                    setTimeout(() => {
+                        const reply = document.createElement('div');
+                        reply.className = 'bg-[#172a45] text-sky-50 rounded-2xl rounded-tr-sm p-3 max-w-[85%] border border-white/10 shadow';
+                        reply.innerHTML = `<div class="text-[11px] font-bold text-mirsal-cyan mb-1">مرسال</div><p>وصلت رسالتك عبر مرسال بسرعة فائقة ⚡</p><div class="text-[10px] text-sky-300/70 text-left mt-1">${timeStr}</div>`;
+                        messagesContainer.appendChild(reply);
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }, 600);
+                });
+            }
+        });
+
+        // ضمان إتاحة الدوال على window بشكل صريح
+        window.handleApkDownload = handleApkDownload;
+        window.handleDesktopClick = handleDesktopClick;
+        window.closeDesktopModal = closeDesktopModal;
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // الأسئلة الشائعة (Accordion)
+        function toggleFaq(button) {
+            const content = button.nextElementSibling;
+            const icon = button.querySelector('.faq-icon') || button.querySelector('span:last-child');
+            if (!content) return;
+
+            const isOpen = !content.classList.contains('hidden');
+            content.classList.toggle('hidden', isOpen);
+            if (icon) {
+                icon.textContent = isOpen ? '+' : '−';
+            }
+        }
+        window.toggleFaq = toggleFaq;
+
+        // خلفية الكانفاس التفاعلية (فقاعات زجاجية وطائرات ورقية)
+        (function initCanvas() {
+            const canvas = document.getElementById('heroCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            let width = 0;
+            let height = 0;
+            const bubbles = [];
+            const planes = [];
+            const pointer = { x: -9999, y: -9999 };
+
+            function resize() {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            function createItems() {
+                bubbles.length = 0;
+                planes.length = 0;
+
+                const bubbleCount = Math.min(18, Math.max(8, Math.floor(width / 90)));
+                for (let i = 0; i < bubbleCount; i++) {
+                    bubbles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        w: 44 + Math.random() * 44,
+                        h: 30 + Math.random() * 26,
+                        vx: (Math.random() - 0.5) * 0.35,
+                        vy: -0.25 - Math.random() * 0.45,
+                        alpha: 0.08 + Math.random() * 0.12
+                    });
+                }
+
+                const planeCount = Math.min(6, Math.max(3, Math.floor(width / 260)));
+                for (let i = 0; i < planeCount; i++) {
+                    planes.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        scale: 0.65 + Math.random() * 0.6,
+                        vx: 0.6 + Math.random() * 0.7,
+                        vy: -0.25 - Math.random() * 0.35
+                    });
+                }
+            }
+
+            function drawBubble(b) {
+                ctx.save();
+                ctx.translate(b.x, b.y);
+                ctx.fillStyle = `rgba(255, 255, 255, ${b.alpha})`;
+                ctx.strokeStyle = `rgba(0, 242, 254, ${b.alpha * 2.2})`;
+                ctx.lineWidth = 1.2;
+
+                const r = 10;
+                ctx.beginPath();
+                ctx.roundRect(-b.w / 2, -b.h / 2, b.w, b.h, r);
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            function drawPlane(p) {
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                const angle = Math.atan2(p.vy, p.vx);
+                ctx.rotate(angle);
+                ctx.scale(p.scale, p.scale);
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+                ctx.strokeStyle = 'rgba(0, 242, 254, 0.55)';
+                ctx.lineWidth = 1.4;
+
+                ctx.beginPath();
+                ctx.moveTo(16, 0);
+                ctx.lineTo(-12, -10);
+                ctx.lineTo(-6, 0);
+                ctx.lineTo(-12, 10);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                for (const b of bubbles) {
+                    const dx = b.x - pointer.x;
+                    const dy = b.y - pointer.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > 0 && dist < 120) {
+                        b.x += (dx / dist) * 0.9;
+                        b.y += (dy / dist) * 0.9;
+                    }
+
+                    b.x += b.vx;
+                    b.y += b.vy;
+
+                    if (b.y < -60) {
+                        b.y = height + 60;
+                        b.x = Math.random() * width;
+                    }
+                    if (b.x < -80) b.x = width + 80;
+                    if (b.x > width + 80) b.x = -80;
+
+                    drawBubble(b);
+                }
+
+                for (const p of planes) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x > width + 80) {
+                        p.x = -80;
+                        p.y = Math.random() * height;
+                    }
+                    if (p.y < -80) {
+                        p.y = height + 80;
+                    }
+
+                    drawPlane(p);
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            window.addEventListener('resize', () => {
+                resize();
+                createItems();
+            });
+            window.addEventListener('mousemove', (e) => {
+                pointer.x = e.clientX;
+                pointer.y = e.clientY;
+            });
+
+            resize();
+            createItems();
+            animate();
+        })();
+    </script>
+</body>
+</html>
